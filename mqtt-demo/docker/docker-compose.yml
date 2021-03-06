@@ -1,0 +1,29 @@
+version: "3"
+services:
+    mqtt-broker:
+        build:
+            context: ./
+            dockerfile: ./mqtt-broker.dockerfile
+            args:
+                VERSION: 0.1
+        ports:
+            - "1883:1883"
+        command: mosquitto -v
+    mqtt-subscriber:
+        build:
+            context: ./
+            dockerfile: ./mqtt-clients.dockerfile
+            args:
+                VERSION: 0.1
+        depends_on:
+            - mqtt-broker
+        command: mosquitto_sub -h mqtt-broker -i testSub -t debug
+    mqtt-publisher:
+        build:
+            context: ./
+            dockerfile: ./mqtt-clients.dockerfile
+            args:
+                VERSION: 0.1
+        depends_on:
+            - mqtt-broker
+        command: mosquitto_pub -h 127.0.0.1 -i testPublish -t debug -m "Hello World"
